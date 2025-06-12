@@ -25,7 +25,7 @@ pip install numpy scipy
 
 ## Struktura danych wejściowych
 
-System oczekuje pliku `bboxes.txt` w następującym formacie:
+System oczekuje pliku  bboxes.txt  w następującym formacie:
 c6s1_000451.jpg
 
 1
@@ -42,6 +42,8 @@ c6s1_000476.jpg
 
 129.726782 129.260259 83.352052 195.317495
 
+etc.
+
 Gdzie:
 - Pierwsza linia: nazwa pliku obrazu
 - Druga linia: liczba obiektów w klatce
@@ -53,10 +55,9 @@ Gdzie:
 python main.py /path/to/data/folder
 
 
-### Śledzenie z ewaluacją
+### Śledzenie z oceną dokładności
 
-Jeśli folder zawiera plik `bboxes_gt.txt` z danymi referencyjnymi:
-
+Jeśli folder zawiera plik bboxes_gt.txt  z danymi referencyjnymi:
 
 System automatycznie wykryje dane referencyjne i wyświetli dokładność śledzenia.
 
@@ -68,15 +69,89 @@ System automatycznie wykryje dane referencyjne i wyświetli dokładność śledz
 ## Algorytm
 
 System wykorzystuje następujące komponenty:
+## Algorytm śledzenia - krok po kroku
 
-1. **Macierz kosztów** - Obliczanie kosztów przypisania na podstawie:
-   - Dystansu między obiektami
-   - Podobieństwa obszarów
-   - Predykcji ruchu
+### 1. Wczytanie danych
+- System wczytuje plik  bboxes.txt  z pozycjami obiektów w każdej klatce
+- Sortuje klatki według numerów (wyciąganych z nazw plików)
+- Przygotowuje struktury do przechowywania historii ruchu
 
-2. **Algorytm węgierski** - Optymalne rozwiązanie problemu przypisania
+### 2. Przetwarzanie pierwszej klatki
+- Dla pierwszej klatki wszystkie obiekty otrzymują ID = -1 (nowe obiekty)
+- Nie ma jeszcze historii ruchu do analizy
 
-3. **Historia ruchu** - Śledzenie pozycji obiektów dla lepszej predykcji
+### 3. Przetwarzanie kolejnych klatek
+Dla każdej kolejnej klatki system wykonuje następujące kroki:
+
+#### 3.1 Obliczanie różnicy czasowej
+
+delta_ramek = numer_obecnej_klatki - numer_poprzedniej_klatki
+
+#### 3.2 Tworzenie macierzy kosztów
+Dla każdej pary (obiekt_obecny, obiekt_poprzedni) oblicza:
+
+**Odległość przestrzenną:**
+- Znajduje środki obiektów:  (x + width/2, y + height/2) 
+- Oblicza odległość euklidesową między środkami
+- Normalizuje przez różnicę klatek:  odległość / delta_ramek 
+
+**Podobieństwo obszarów:**
+- Oblicza powierzchnie:  width * height 
+- Wyznacza współczynnik:  min(area1, area2) / max(area1, area2) 
+
+**Predykcja ruchu (jeśli dostępna historia):**
+- Bierze 2 ostatnie pozycje z historii
+- Oblicza prędkość:  (pos2 - pos1) / delta_ramek_historii 
+- Przewiduje pozycję:  ostatnia_pozycja + prędkość * delta_ramek 
+- Oblicza odległość od przewidywanej pozycji
+
+**Końcowy koszt:**
+
+#### 3.2 Tworzenie macierzy kosztów
+Dla każdej pary (obiekt_obecny, obiekt_poprzedni) oblicza:
+
+**Odległość przestrzenną:**
+- Znajduje środki obiektów: (x + width/2, y + height/2)
+- Oblicza odległość euklidesową między środkami
+- Normalizuje przez różnicę klatek: odległość / delta_ramek
+
+**Podobieństwo obszarów:**
+- Oblicza powierzchnie:  width * height 
+- Wyznacza współczynnik:  min(area1, area2) / max(area1, area2) 
+
+**Predykcja ruchu (jeśli dostępna historia):**
+- Bierze 2 ostatnie pozycje z historii
+- Oblicza prędkość:  (pos2 - pos1) / delta_ramek_historii 
+- Przewiduje pozycję:  ostatnia_pozycja + prędkość * delta_ramek 
+- Oblicza odległość od przewidywanej pozycji
+
+**Końcowy koszt:**
+
+koszt = 0.6 * (odległość_znormalizowana / próg_dystansu) + 0.4 * (1 - podobieństwo_obszaru) - 0.25 * bonus_za_predykcję
+
+
+#### 3.3 Filtrowanie możliwych przypisań
+- Odrzuca pary gdzie odległość > próg_dystansu (50 pikseli)
+- Odrzuca pary gdzie podobieństwo < min_podobieństwo (0.3)
+
+#### 3.4 Algorytm węgierski - łączenie z prawdopodobieństwem
+- Używa  scipy.optimize.linear_sum_assignment 
+- Znajduje optymalne przypisanie minimalizujące całkowity koszt
+- Odrzuca przypisania o koszcie > 0.75
+
+#### 3.5 Aktualizacja historii ruchu
+- Dla każdego przypisanego obiektu dodaje nową pozycję do historii
+- Ogranicza historię do ostatnich 4 pozycji
+- Historia przechowuje środki obiektów: [center_x, center_y, width, height]
+
+### 4. Zapis wyników
+
+## Parametry algorytmu
+
+- **prog_dystansu**: 50 pikseli - maksymalna odległość dla przypisania
+- **min_podobienstwo**: 0.3 - minimalny próg podobieństwa obszarów
+- **próg_akceptacji**: 0.75 - maksymalny koszt dla zaakceptowania przypisania
+- **rozmiar_historii**: 4 pozycje - ile ostatnich pozycji pamiętać
 
 ## Wyniki
 
