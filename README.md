@@ -16,8 +16,8 @@ Aplikacja implementuje zaawansowany system śledzenia obiektów, który analizuj
 - **Eksport wyników** - Zapis rezultatów do pliku tekstowego
 
 ## Wymagania
-python >= 3.6
 numpy
+
 scipy
 
 ## Instalacja
