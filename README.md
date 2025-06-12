@@ -26,16 +26,20 @@ pip install numpy scipy
 ## Struktura danych wejściowych
 
 System oczekuje pliku `bboxes.txt` w następującym formacie:
+c6s1_000451.jpg
+1
+420.836933 144.188985 88.328294 216.466523
+c6s1_000476.jpg
+3
+325.044276 151.653348 126.894168 204.025918
+177.001080 160.361771 90.816415 153.019438
+129.726782 129.260259 83.352052 195.317495
 
-frame_001.jpg
-2
-x1 y1 width1 height1
-x2 y2 width2 height2
-frame_002.jpg
-2
-x1 y1 width1 height1
-x2 y2 width2 height2
-
+Gdzie:
+- Pierwsza linia: nazwa pliku obrazu
+- Druga linia: liczba obiektów w klatce
+- Następne linie: współrzędne obiektów w formacie x,y,width,height
+- 
 ## Użycie
 
 ### Podstawowe śledzenie
@@ -54,16 +58,20 @@ System automatycznie wykryje dane referencyjne i wyświetli dokładność śledz
 
 Plik `bboxes_gt.txt` powinien zawierać:
 
-frame_001.jpg
-2
-id1 x1 y1 width1 height1
-id2 x2 y2 width2 height2
+c6s1_000451.jpg
+1
+-1 420.836933 144.188985 88.328294 216.466523
+c6s1_000476.jpg
+3
+-1 325.044276 151.653348 126.894168 204.025918
+-1 177.001080 160.361771 90.816415 153.019438
+0 129.726782 129.260259 83.352052 195.317495
 
-
+Gdzie pierwsza kolumna to ID obiektu (-1 oznacza nowy obiekt).
 ## Parametry konfiguracyjne
 
-- `prog_dystansu`: Maksymalny dystans dla przypisania obiektów (domyślnie: 50)
-- `min_podobienstwo`: Minimalny próg podobieństwa obszarów (domyślnie: 0.3)
+- prog_dystansu: Maksymalny dystans dla przypisania obiektów (domyślnie: 50)
+- min_podobienstwo: Minimalny próg podobieństwa obszarów (domyślnie: 0.3)
 
 ## Algorytm
 
