@@ -107,26 +107,6 @@ Dla każdej pary (obiekt_obecny, obiekt_poprzedni) oblicza:
 
 **Końcowy koszt:**
 
-#### 3.2 Tworzenie macierzy kosztów
-Dla każdej pary (obiekt_obecny, obiekt_poprzedni) oblicza:
-
-**Odległość przestrzenną:**
-- Znajduje środki obiektów: (x + width/2, y + height/2)
-- Oblicza odległość euklidesową między środkami
-- Normalizuje przez różnicę klatek: odległość / delta_ramek
-
-**Podobieństwo obszarów:**
-- Oblicza powierzchnie:  width * height 
-- Wyznacza współczynnik:  min(area1, area2) / max(area1, area2) 
-
-**Predykcja ruchu (jeśli dostępna historia):**
-- Bierze 2 ostatnie pozycje z historii
-- Oblicza prędkość:  (pos2 - pos1) / delta_ramek_historii 
-- Przewiduje pozycję:  ostatnia_pozycja + prędkość * delta_ramek 
-- Oblicza odległość od przewidywanej pozycji
-
-**Końcowy koszt:**
-
 koszt = 0.6 * (odległość_znormalizowana / próg_dystansu) + 0.4 * (1 - podobieństwo_obszaru) - 0.25 * bonus_za_predykcję
 
 
