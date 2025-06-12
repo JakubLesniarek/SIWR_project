@@ -116,5 +116,5 @@ System jest szczególnie przydatny w:
 MIT License
 
 ## Autor
-Jakub Lesniarek
-Piotr Skoracki
+## Jakub Lesniarek
+## Piotr Skoracki
