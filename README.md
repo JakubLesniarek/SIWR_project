@@ -105,11 +105,6 @@ Dla każdej pary (obiekt_obecny, obiekt_poprzedni) oblicza:
 - Przewiduje pozycję:  ostatnia_pozycja + prędkość * delta_ramek 
 - Oblicza odległość od przewidywanej pozycji
 
-**Końcowy koszt:**
-
-koszt = 0.6 * (odległość_znormalizowana / próg_dystansu) + 0.4 * (1 - podobieństwo_obszaru) - 0.25 * bonus_za_predykcję
-
-
 #### 3.3 Filtrowanie możliwych przypisań
 - Odrzuca pary gdzie odległość > próg_dystansu (50 pikseli)
 - Odrzuca pary gdzie podobieństwo < min_podobieństwo (0.3)
